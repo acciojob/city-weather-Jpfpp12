@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import 'regenerator-runtime/runtime';
 import './App.css';
 
 function App() {
-  const [query, setQuery] = useState('');
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const queryInputRef = useRef(null);
 
   const API_KEY = process.env.REACT_APP_API_KEY;
 
   const getWeather = async () => {
+    const query = queryInputRef.current.value;
     if (!query) return;
 
     setLoading(true);
@@ -31,7 +32,7 @@ function App() {
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
       setError('');
-      setQuery(''); // Clear input after successful weather fetch
+      queryInputRef.current.value = '';
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
@@ -39,24 +40,25 @@ function App() {
       setLoading(false);
     }
   };
+
   return (
     <div className="App">
   {/* Do not remove the main div */}
       <h1>City Weather App</h1>
       <input
+        ref={queryInputRef}
         className="search"
         type="text"
         placeholder="Enter city name"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
       />
       <button onClick={getWeather}>Search</button>
 
-      <div className="weather">
+      {loading && <p>Loading...</p>}
+      
+      <div className="weather" style={{ height: weather ? 'auto' : '0' }}>
         {weather && (
           <>
-            <h2>{query.toUpperCase()}</h2>
-            <p>{weather.temperature} °C</p>
+            <h2>{weather.temperature} °C</h2>
             <p>{weather.description}</p>
             <img src={weather.icon} alt="weather icon" />
           </>
@@ -68,4 +70,5 @@ function App() {
 }
 
 export default App;
+
 

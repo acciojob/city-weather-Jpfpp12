@@ -1,6 +1,4 @@
-// src/App.js
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
@@ -8,16 +6,22 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
 
-  const API_KEY = 'e6ee182dff98e269b0201414a17e7d4c';
+  const API_KEY = process.env.REACT_APP_API_KEY;
 
   const getWeather = async () => {
     if (!query) return;
 
     try {
-      const response = await axios.get(
+      const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}&units=metric`
       );
-      const data = response.data;
+
+      if (!response.ok) {
+        throw new Error('City not found');
+      }
+
+      const data = await response.json();
+
       setWeather({
         temperature: data.main.temp,
         description: data.weather[0].description,
@@ -29,6 +33,12 @@ function App() {
       setError('City not found. Please try again.');
     }
   };
+
+  useEffect(() => {
+    if (query) {
+      getWeather();
+    }
+  }, [query]);
 
   return (
     <div className="App">

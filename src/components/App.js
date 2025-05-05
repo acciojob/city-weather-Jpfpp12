@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import 'regenerator-runtime/runtime'; // Add this line
 import './App.css';
-import 'regenerator-runtime/runtime';
 
 function App() {
   const [query, setQuery] = useState('');
@@ -20,15 +20,14 @@ function App() {
       if (!response.ok) {
         throw new Error('City not found');
       }
-
       const data = await response.json();
-
       setWeather({
         temperature: data.main.temp,
         description: data.weather[0].description,
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
       setError('');
+      setQuery('');
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
@@ -43,7 +42,7 @@ function App() {
 
   return (
     <div className="App">
-        {/* Do not remove the main div */}
+  {/* Do not remove the main div */}
       <h1>City Weather App</h1>
       <input
         className="search"
@@ -70,3 +69,4 @@ function App() {
 }
 
 export default App;
+

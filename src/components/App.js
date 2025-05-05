@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import 'regenerator-runtime/runtime';
 import './App.css';
 
@@ -7,7 +7,7 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   const [isCityFound, setIsCityFound] = useState(false);
-  const [cityName, setCityName] = useState('');
+  const inputRef = useRef(null); // Ref to input element
 
   const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -25,8 +25,10 @@ function App() {
 
       const data = await response.json();
 
-      setCityName(query);
+      const cityName = query;
+
       setWeather({
+        city: cityName,
         temperature: data.main.temp,
         description: data.weather[0].description,
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
@@ -34,7 +36,12 @@ function App() {
 
       setError('');
       setIsCityFound(true);
-      setQuery(''); // ✅ This clears the input correctly
+
+      // Clear the input using DOM
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
@@ -42,17 +49,23 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    if (query && !isCityFound) {
+      getWeather();
+    }
+  }, [query, isCityFound]);
+
   return (
     <div className="App">
       <h1>City Weather App</h1>
-
       {!isCityFound && (
         <div>
           <input
             className="search"
             type="text"
             placeholder="Enter city name"
-            value={query}
+            defaultValue={query}
+            ref={inputRef}
             onChange={(e) => setQuery(e.target.value)}
           />
           <button onClick={getWeather}>Search</button>
@@ -62,7 +75,7 @@ function App() {
       <div className="weather">
         {weather && (
           <>
-            <h2>{cityName.toUpperCase()}</h2>
+            <h2>{weather.city.toUpperCase()}</h2>
             <p>{weather.temperature} °C</p>
             <p>{weather.description}</p>
             <img src={weather.icon} alt="weather icon" />

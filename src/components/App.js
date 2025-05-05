@@ -6,12 +6,14 @@ function App() {
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const API_KEY = process.env.REACT_APP_API_KEY;
 
   const getWeather = async () => {
     if (!query) return;
 
+    setLoading(true);
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}&units=metric`
@@ -20,26 +22,23 @@ function App() {
       if (!response.ok) {
         throw new Error('City not found');
       }
+
       const data = await response.json();
+
       setWeather({
         temperature: data.main.temp,
         description: data.weather[0].description,
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
       setError('');
-      setQuery('');
+      setQuery(''); // Clear input after successful weather fetch
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (query) {
-      getWeather();
-    }
-  }, [query]);
-
   return (
     <div className="App">
   {/* Do not remove the main div */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import 'regenerator-runtime/runtime';
 
 function App() {
   const [query, setQuery] = useState('');

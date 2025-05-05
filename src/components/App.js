@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import 'regenerator-runtime/runtime';
 import './App.css';
 
@@ -7,6 +7,7 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   const [isCityFound, setIsCityFound] = useState(false);
+  const inputRef = useRef(null); // Ref to input element
 
   const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -24,10 +25,10 @@ function App() {
 
       const data = await response.json();
 
-      const cityName = query; // Store query before clearing it
+      const cityName = query;
 
       setWeather({
-        city: cityName, // Use stored city name
+        city: cityName,
         temperature: data.main.temp,
         description: data.weather[0].description,
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
@@ -35,7 +36,11 @@ function App() {
 
       setError('');
       setIsCityFound(true);
-      setQuery('');
+
+      // Clear the input using DOM
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
 
     } catch (err) {
       setWeather(null);
@@ -59,7 +64,8 @@ function App() {
             className="search"
             type="text"
             placeholder="Enter city name"
-            value={query}
+            defaultValue={query}
+            ref={inputRef}
             onChange={(e) => setQuery(e.target.value)}
           />
           <button onClick={getWeather}>Search</button>

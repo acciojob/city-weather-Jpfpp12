@@ -24,15 +24,19 @@ function App() {
 
       const data = await response.json();
 
+      const cityName = query; // Store query before clearing it
+
       setWeather({
+        city: cityName, // Use stored city name
         temperature: data.main.temp,
         description: data.weather[0].description,
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
+
       setError('');
-      
       setIsCityFound(true);
       setQuery('');
+
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
@@ -41,10 +45,10 @@ function App() {
   };
 
   useEffect(() => {
-    if (query) {
+    if (query && !isCityFound) {
       getWeather();
     }
-  }, [query]);
+  }, [query, isCityFound]);
 
   return (
     <div className="App">
@@ -65,7 +69,7 @@ function App() {
       <div className="weather">
         {weather && (
           <>
-            <h2>{query.toUpperCase()}</h2>
+            <h2>{weather.city.toUpperCase()}</h2>
             <p>{weather.temperature} °C</p>
             <p>{weather.description}</p>
             <img src={weather.icon} alt="weather icon" />

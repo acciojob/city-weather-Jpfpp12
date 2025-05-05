@@ -6,6 +6,7 @@ function App() {
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
+  const [inputCleared, setInputCleared] = useState(false);
 
   const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -29,9 +30,9 @@ function App() {
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
       setError('');
-      
-      // Clear the input after a valid city is entered
+
       setQuery('');
+      setInputCleared(true);
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
@@ -47,15 +48,18 @@ function App() {
   return (
     <div className="App">
       <h1>City Weather App</h1>
-      <input
-        className="search"
-        type="text"
-        placeholder="Enter city name"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
-      <button onClick={getWeather}>Search</button>
-
+      {!weather && !inputCleared && (
+        <div>
+          <input
+            className="search"
+            type="text"
+            placeholder="Enter city name"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <button onClick={getWeather}>Search</button>
+        </div>
+      )}
       <div className="weather">
         {weather && (
           <>

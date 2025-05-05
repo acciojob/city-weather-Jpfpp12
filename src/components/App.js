@@ -6,25 +6,24 @@ function App() {
   const [query, setQuery] = useState('');
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
-  const [isCityFound, setIsCityFound] = useState(false);
   
   const API_KEY = process.env.REACT_APP_API_KEY;
 
   const getWeather = async () => {
-    if (!query) return;
-    
+    if (!query.trim()) return; // Prevent empty searches
+
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}&units=metric`
       );
-      
+
       if (!response.ok) {
         throw new Error('City not found');
       }
-      
+
       const data = await response.json();
       const cityName = query;
-      
+
       setWeather({
         city: cityName,
         temperature: data.main.temp,
@@ -32,38 +31,36 @@ function App() {
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
       setError('');
-      setIsCityFound(true);
+
+      // Delay clearing input so it doesn't clear before the request finishes
+      setTimeout(() => setQuery(''), 100);
       
-      // Clear the input by updating the state
-      setQuery('');
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
-      setIsCityFound(false);
     }
   };
 
   useEffect(() => {
-    if (query && !isCityFound) {
+    if (query) {
       getWeather();
     }
-  }, [query, isCityFound]);
+  }, [query]); // Remove isCityFound dependency
 
   return (
     <div className="App">
       <h1>City Weather App</h1>
-      {!isCityFound && (
-        <div>
-          <input
-            className="search"
-            type="text"
-            placeholder="Enter city name"
-            value={query} // Use controlled input pattern
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button onClick={getWeather}>Search</button>
-        </div>
-      )}
+      <div>
+        <input
+          className="search"
+          type="text"
+          placeholder="Enter city name"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <button onClick={getWeather}>Search</button>
+      </div>
+      
       <div className="weather">
         {weather && (
           <>

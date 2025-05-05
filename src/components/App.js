@@ -10,7 +10,7 @@ function App() {
   const API_KEY = process.env.REACT_APP_API_KEY;
 
   const getWeather = async () => {
-    if (!query.trim()) return; // Prevent empty searches
+    if (!query.trim()) return; // Prevents unnecessary calls
 
     try {
       const response = await fetch(
@@ -30,9 +30,10 @@ function App() {
         description: data.weather[0].description,
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
+
       setError('');
 
-      // Delay clearing input so it doesn't clear before the request finishes
+      // Ensures input is cleared AFTER React updates the state properly
       setTimeout(() => setQuery(''), 100);
       
     } catch (err) {
@@ -45,7 +46,7 @@ function App() {
     if (query) {
       getWeather();
     }
-  }, [query]); // Remove isCityFound dependency
+  }, [query]);
 
   return (
     <div className="App">

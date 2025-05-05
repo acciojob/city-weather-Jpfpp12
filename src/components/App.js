@@ -7,7 +7,7 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   
-  const API_KEY = process.env.REACT_APP_API_KEY;
+  const API_KEY ='e6ee182dff98e269b0201414a17e7d4c';
 
   const getWeather = async () => {
     if (!query.trim()) return; // Prevents unnecessary calls

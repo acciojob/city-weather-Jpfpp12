@@ -1,20 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'regenerator-runtime/runtime';
 import './App.css';
 
 function App() {
+  const [query, setQuery] = useState('');
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const queryInputRef = useRef(null);
 
   const API_KEY = process.env.REACT_APP_API_KEY;
 
   const getWeather = async () => {
-    const query = queryInputRef.current.value;
     if (!query) return;
 
-    setLoading(true);
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}&units=metric`
@@ -32,33 +29,38 @@ function App() {
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
       setError('');
-      queryInputRef.current.value = '';
+      
+      // Clear the input after a valid city is entered
+      setQuery('');
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (query) {
+      getWeather();
+    }
+  }, [query]);
+
   return (
     <div className="App">
-  {/* Do not remove the main div */}
       <h1>City Weather App</h1>
       <input
-        ref={queryInputRef}
         className="search"
         type="text"
         placeholder="Enter city name"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
       <button onClick={getWeather}>Search</button>
 
-      {loading && <p>Loading...</p>}
-      
-      <div className="weather" style={{ height: weather ? 'auto' : '0' }}>
+      <div className="weather">
         {weather && (
           <>
-            <h2>{weather.temperature} °C</h2>
+            <h2>{query.toUpperCase()}</h2>
+            <p>{weather.temperature} °C</p>
             <p>{weather.description}</p>
             <img src={weather.icon} alt="weather icon" />
           </>
@@ -70,5 +72,3 @@ function App() {
 }
 
 export default App;
-
-

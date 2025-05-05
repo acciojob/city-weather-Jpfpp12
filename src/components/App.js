@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'regenerator-runtime/runtime';
 import './App.css';
 
@@ -7,41 +7,35 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState('');
   const [isCityFound, setIsCityFound] = useState(false);
-  const inputRef = useRef(null); // Ref to input element
-
+  
   const API_KEY = process.env.REACT_APP_API_KEY;
 
   const getWeather = async () => {
     if (!query) return;
-
+    
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}&units=metric`
       );
-
+      
       if (!response.ok) {
         throw new Error('City not found');
       }
-
+      
       const data = await response.json();
-
       const cityName = query;
-
+      
       setWeather({
         city: cityName,
         temperature: data.main.temp,
         description: data.weather[0].description,
         icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`
       });
-
       setError('');
       setIsCityFound(true);
-
-      // Clear the input using DOM
-      if (inputRef.current) {
-        inputRef.current.value = '';
-      }
-
+      
+      // Clear the input by updating the state
+      setQuery('');
     } catch (err) {
       setWeather(null);
       setError('City not found. Please try again.');
@@ -64,14 +58,12 @@ function App() {
             className="search"
             type="text"
             placeholder="Enter city name"
-            defaultValue={query}
-            ref={inputRef}
+            value={query} // Use controlled input pattern
             onChange={(e) => setQuery(e.target.value)}
           />
           <button onClick={getWeather}>Search</button>
         </div>
       )}
-
       <div className="weather">
         {weather && (
           <>
